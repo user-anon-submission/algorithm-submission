@@ -1,0 +1,35 @@
+[package]
+name = "anonlib"
+version = "6.0.0"
+edition = "2024"
+authors = ["Anonymous Authors"]
+license = "GPL-3.0-or-later"
+
+[lib]
+name = "anonlib"
+crate-type = ["cdylib", "rlib"]
+doctest = false
+
+[features]
+# Deliberately NOT in `default`: pyo3/extension-module omits libpython linkage,
+# so with it on by default every `cargo build`/`test`/`run` fails to link the
+# stub_gen binary. Maturin turns it on for wheels via [tool.maturin] features.
+default = []
+extension-module = ["pyo3/extension-module"]
+
+[profile.release]
+debug = 1
+
+[dependencies]
+rand = "0.10.0"
+rayon = "1.11.0"                                                # data parallelism and multi-threading support.
+rustc-hash = { version = "2.1.1", default-features = true }     # a fast hash map implementation.
+pyo3 = { version = "0.29.0", features = [] }                    # Python compatibility (extension-module feature gated)
+pyo3-stub-gen = "0.23"
+
+[[bin]]
+name = "stub_gen"
+path = "src/bin/stub_gen.rs"
+
+[package.metadata.maturin]
+name = "anonlib"

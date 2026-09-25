@@ -1,0 +1,28 @@
+//! The crate-wide `debug!` logging macro.
+//! This Source Code Form is subject to the terms of The GNU General Public License v3.0
+//! Copyright 2025 - Anonymous Authors. If a copy of the MPL was not distributed with this
+//! file, You can obtain one at https://www.gnu.org/licenses/gpl-3.0.html
+
+/// `debug!(level, fmt, ..)` with `level` one of `debug`, `warn`, `err`.
+/// Prints unconditionally to stdout, tagged with file and line.
+#[macro_export]
+macro_rules! debug {
+    ($level:ident, $($arg:tt)*) => {
+        {
+            let (lvl, color) = match stringify!($level) {
+                "debug"   => ("DEBUG"  , "\x1b[34m"),
+                "warn" => ("WARNING", "\x1b[33m"),
+                "err"   => ("ERROR"  , "\x1b[31m"),
+                other     => (other   , "\x1b[0m"),
+            };
+
+            let file = file!();
+            let line = line!();
+            println!(
+                "{}[ {}: {}:{} {}]\x1b[0m {}",
+                color, lvl, file, line, color,
+                format_args!($($arg)*)
+            );
+        }
+    };
+}
